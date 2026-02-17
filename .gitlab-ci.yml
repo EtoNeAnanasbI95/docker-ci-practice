@@ -15,3 +15,4 @@ workflow:
         - 'deploy/CI_CD/frontend-lint.yml'
     - when: never
 
+
