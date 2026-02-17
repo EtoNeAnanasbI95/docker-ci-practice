@@ -1,0 +1,57 @@
+version: '3.8'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - type: bind
+        source: /web-server/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+      - type: bind
+        source: /web-server/letsencrypt
+        target: /etc/letsencrypt
+      - type: bind
+        source: /web-server/www
+        target: /var/www/html
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - coursework-net
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - type: bind
+        source: /web-server/letsencrypt
+        target: /etc/letsencrypt
+      - type: bind
+        source: /web-server/www
+        target: /var/www/html
+    command: sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/html --post-hook 'docker service update --force nginx_nginx'; sleep 12h & wait $${!}; done"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - coursework-net
+
+networks:
+  coursework-net:
+    external: true

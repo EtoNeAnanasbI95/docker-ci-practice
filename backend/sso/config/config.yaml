@@ -1,0 +1,6 @@
+env: "dev"
+connection_string: "postgres://db:db@91.222.236.132:5432/db?sslmode=disable"
+secret: "fourthcoursefirthproject"
+http:
+  port: 8081
+  timeout: 15m

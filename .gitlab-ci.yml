@@ -1,0 +1,17 @@
+stages:
+  - lint
+  - build
+  - test
+  - audit
+
+include:
+  - local: 'deploy/CI_CD/frontend-lint.yml'
+
+workflow:
+  rules:
+    - changes:
+        - 'frontend/**/*'
+        - '.gitlab-ci.yml'
+        - 'deploy/CI_CD/frontend-lint.yml'
+    - when: never
+

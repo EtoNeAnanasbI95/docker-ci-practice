@@ -1,0 +1,96 @@
+- name: Setup nginx with docker swarm
+  hosts: manager_node
+  collections:
+    - community.docker
+  vars:
+    dest_dir: "/web-server"
+    domen: "notkirilov-coursework.ru"
+    email: "notkirilov@mail.ru"
+    stack_name: "nginx"
+    sub_domens:
+      - "api.notkirilov-coursework.ru"
+      - "adminer.notkirilov-coursework.ru"
+  tasks:
+    - name: Create proj dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: directory
+        mode: "0755"
+      failed_when: false
+
+    - name: Setup docker network
+      community.docker.docker_network:
+        name: coursework-net
+        driver: overlay
+        state: present
+
+    - name: Setup nginx docker stack
+      ansible.builtin.copy:
+        src: ./templates/nginx-stack.yml
+        mode: "0644"
+        dest: "{{ dest_dir }}/nginx-stack.yml"
+
+    - name: Setup nginx conf file
+      ansible.builtin.template:
+        src: ./templates/nginx.conf
+        mode: "0644"
+        dest: "{{ dest_dir }}/nginx.conf"
+
+    - name: Check if stack exists
+      ansible.builtin.command: docker stack ls --format "{{ '{{' }}.Name{{ '}}' }}" | grep -q "{{ stack_name }}"
+      register: stack_exists
+      failed_when: false
+
+    - name: Remove existing nginx stack
+      ansible.builtin.command: docker stack rm {{ stack_name }}
+      when: stack_exists.rc == 1
+      args:
+        chdir: "{{ dest_dir }}"
+      failed_when: false
+      ignore_errors: true
+
+    - name: Deploy nginx stack
+      ansible.builtin.command: docker stack deploy -c nginx-stack.yml {{ stack_name }}
+      args:
+        chdir: "{{ dest_dir }}"
+
+    - name: Get ssl certificates
+      ansible.builtin.command: |
+        docker run --rm \
+        -v "{{ dest_dir }}/letsencrypt:/etc/letsencrypt" \
+        -v "{{ dest_dir }}/www:/var/www/html" \
+        certbot/certbot certonly --webroot \
+        -w /var/www/html \
+        -d "{{ domen }}" \
+        -d "www.{{ domen }}" \
+        {% for sub_domen in sub_domens %} -d "{{ sub_domen }}" {% endfor %} \
+        --email "{{ email }}" \
+        --agree-tos \
+        --no-eff-email \
+        --force-renewal \
+        --preferred-challenges http
+      args:
+        chdir: "{{ dest_dir }}"
+
+    - name: Add SSL block to nginx config
+      ansible.builtin.blockinfile:
+        path: "{{ dest_dir }}/nginx.conf"
+        insertafter: "http {"
+        marker: "# {mark} SSL BLOCK"
+        block: |
+          server {
+            listen 443 ssl;
+            server_name {{ domen }} www.{{ domen }} {% for sub_domen in sub_domens %} {{ sub_domen }}{% endfor %};
+
+            ssl_certificate /etc/letsencrypt/live/{{ domen }}/fullchain.pem;
+            ssl_certificate_key /etc/letsencrypt/live/{{ domen }}/privkey.pem;
+
+            location / {
+              return 404;
+            }
+          }
+
+    - name: Update nginx service with SSL config
+      ansible.builtin.command: docker service update {{ stack_name }}_nginx
+      args:
+        chdir: "{{ dest_dir }}"

@@ -1,0 +1,81 @@
+.default_frontend_job:
+  image: node:20-alpine
+  cache:
+    key: "pnpm-${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .pnpm-store
+  before_script:
+    - corepack enable
+    - pnpm config set store-dir .pnpm-store
+  rules:
+    - changes:
+        - "frontend/**/*"
+        - ".gitlab-ci.yml"
+
+.frontend_adminer_job:
+  extends: .default_frontend_job
+  variables:
+    PNPM_FLAGS: "--frozen-lockfile"
+  artifacts:
+    when: always
+    expire_in: 7 days
+
+build:adminer:
+  extends: .frontend_adminer_job
+  stage: build
+  script:
+    - cd frontend/adminer
+    - pnpm install $PNPM_FLAGS
+    - pnpm build
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - frontend/adminer/dist/
+
+lint:adminer:
+  extends: .frontend_adminer_job
+  stage: lint
+  needs:
+    - build:adminer
+  script:
+    - cd frontend/adminer
+    - pnpm install $PNPM_FLAGS
+    - pnpm lint
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - frontend/adminer/eslint-report.*
+      - frontend/adminer/lint-report.*
+
+test:adminer:
+  extends: .frontend_adminer_job
+  stage: test
+  needs:
+    - build:adminer
+  script:
+    - cd frontend/adminer
+    - pnpm install $PNPM_FLAGS
+    - pnpm test
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - frontend/adminer/coverage/
+      - frontend/adminer/test-results/
+
+outdated:adminer:
+  extends: .frontend_adminer_job
+  stage: audit
+  needs:
+    - build:adminer
+  script:
+    - cd frontend/adminer
+    - pnpm install $PNPM_FLAGS
+    - pnpm outdated > outdated.txt
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - frontend/adminer/outdated.txt

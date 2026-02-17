@@ -1,0 +1,38 @@
+2025-11-13 08:48:38 [Information] Microsoft.AspNetCore.Hosting.Diagnostics: Request starting "HTTP/1.1" "GET" "http"://"localhost:5000""""/api/OrderStatus""" - "application/json" null
+2025-11-13 08:48:38 [Information] Microsoft.AspNetCore.Hosting.Diagnostics: Request starting "HTTP/1.1" "GET" "http"://"localhost:5000""""/api/Order""" - "application/json" null
+2025-11-13 08:48:38 [Information] Microsoft.AspNetCore.Hosting.Diagnostics: Request starting "HTTP/1.1" "GET" "http"://"localhost:5000""""/api/PaymentStatus""" - "application/json" null
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Cors.Infrastructure.CorsService: CORS policy execution successful.
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Cors.Infrastructure.CorsService: CORS policy execution successful.
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Cors.Infrastructure.CorsService: CORS policy execution successful.
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Routing.EndpointMiddleware: Executing endpoint '"Api.Controllers.PaymentStatusController.GetPaymentStatuses (Api)"'
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Routing.EndpointMiddleware: Executing endpoint '"Api.Controllers.OrderStatusController.GetOrderStatuses (Api)"'
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Routing.EndpointMiddleware: Executing endpoint '"Api.Controllers.OrderController.GetOrders (Api)"'
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Route matched with "{action = \"GetOrders\", controller = \"Order\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[Api.DTOs.OrderSummaryDto]]] GetOrders()" on controller "Api.Controllers.OrderController" ("Api").
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Route matched with "{action = \"GetPaymentStatuses\", controller = \"PaymentStatus\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[Models.ShopDb.PaymentStatus]]] GetPaymentStatuses()" on controller "Api.Controllers.PaymentStatusController" ("Api").
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Route matched with "{action = \"GetOrderStatuses\", controller = \"OrderStatus\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[Models.ShopDb.OrderStatus]]] GetOrderStatuses()" on controller "Api.Controllers.OrderStatusController" ("Api").
+2025-11-13 08:48:39 [Information] Microsoft.EntityFrameworkCore.Database.Command: Executed DbCommand ("22"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT p.id, p.created_at, p.name
+FROM payment_statuses AS p"
+2025-11-13 08:48:39 [Information] Microsoft.EntityFrameworkCore.Database.Command: Executed DbCommand ("23"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT o.id AS \"Id\", o.user_id AS \"UserId\", o.order_date AS \"OrderDate\", o.total_amount AS \"TotalAmount\", o0.name AS \"OrderStatus\", p.name AS \"PaymentStatus\"
+FROM orders AS o
+INNER JOIN order_statuses AS o0 ON o.order_status_id = o0.id
+INNER JOIN payment_statuses AS p ON o.payment_status_id = p.id
+WHERE NOT (o.is_deleted)
+ORDER BY o.order_date DESC"
+2025-11-13 08:48:39 [Information] Microsoft.EntityFrameworkCore.Database.Command: Executed DbCommand ("22"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT o.id, o.created_at, o.name
+FROM order_statuses AS o"
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor: Executing "ObjectResult", writing value of type '"System.Collections.Generic.List`1[[Api.DTOs.OrderSummaryDto, Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"'.
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor: Executing "ObjectResult", writing value of type '"System.Collections.Generic.List`1[[Models.ShopDb.PaymentStatus, Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"'.
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Executed action "Api.Controllers.OrderController.GetOrders (Api)" in 116.7631ms
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor: Executing "ObjectResult", writing value of type '"System.Collections.Generic.List`1[[Models.ShopDb.OrderStatus, Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"'.
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Routing.EndpointMiddleware: Executed endpoint '"Api.Controllers.OrderController.GetOrders (Api)"'
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Hosting.Diagnostics: Request finished "HTTP/1.1" "GET" "http"://"localhost:5000""""/api/Order""" - 200 null "application/json; charset=utf-8" 458.959ms
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Executed action "Api.Controllers.PaymentStatusController.GetPaymentStatuses (Api)" in 117.144ms
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Executed action "Api.Controllers.OrderStatusController.GetOrderStatuses (Api)" in 117.35ms
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Routing.EndpointMiddleware: Executed endpoint '"Api.Controllers.OrderStatusController.GetOrderStatuses (Api)"'
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Routing.EndpointMiddleware: Executed endpoint '"Api.Controllers.PaymentStatusController.GetPaymentStatuses (Api)"'
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Hosting.Diagnostics: Request finished "HTTP/1.1" "GET" "http"://"localhost:5000""""/api/OrderStatus""" - 200 null "application/json; charset=utf-8" 459.2924ms
+2025-11-13 08:48:39 [Information] Microsoft.AspNetCore.Hosting.Diagnostics: Request finished "HTTP/1.1" "GET" "http"://"localhost:5000""""/api/PaymentStatus""" - 200 null "application/json; charset=utf-8" 459.4146ms
+2025-11-13 08:48:51 [Information] Microsoft.Hosting.Lifetime: Application is shutting down...

@@ -1,0 +1,175 @@
+basePath: /
+definitions:
+  github_com_phenirain_sso_internal_dto_auth.AuthRequest:
+    properties:
+      full_name:
+        description: Полное имя (используется при регистрации)
+        example: Иван Иванов
+        type: string
+      login:
+        description: Логин пользователя
+        example: user123
+        type: string
+      password:
+        description: Пароль пользователя
+        example: P@ssw0rd!
+        type: string
+      telegram_chat_id:
+        description: Telegram chat ID для работы с ботом
+        example: 123456789
+        format: int64
+        type: integer
+      telegram_username:
+        description: Telegram username (используется при регистрации)
+        example: my_telegram
+        type: string
+    type: object
+  github_com_phenirain_sso_internal_dto_auth.AuthResponse:
+    properties:
+      access_token:
+        description: Access Token для доступа к защищенным ресурсам
+        type: string
+      refresh_token:
+        description: Refresh Token для обновления пары токенов
+        type: string
+      role:
+        description: Название роли пользователя
+        type: string
+      user_id:
+        description: Идентификатор пользователя
+        type: integer
+    type: object
+  github_com_phenirain_sso_internal_dto_auth.PasswordResetComplete:
+    properties:
+      new_password:
+        description: Новый пароль
+        type: string
+      token:
+        description: Токен сброса пароля
+        type: string
+    type: object
+  github_com_phenirain_sso_internal_dto_auth.PasswordResetRequest:
+    properties:
+      login:
+        description: Логин или Telegram пользователя
+        example: user123
+        type: string
+    type: object
+info:
+  contact: {}
+  description: SSO service API.
+  title: SSO API
+  version: "1.0"
+paths:
+  /auth/logIn:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_phenirain_sso_internal_dto_auth.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_phenirain_sso_internal_dto_auth.AuthResponse'
+      summary: Login user
+      tags:
+      - auth
+  /auth/password/complete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Token + new password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_phenirain_sso_internal_dto_auth.PasswordResetComplete'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Complete password reset
+      tags:
+      - auth
+  /auth/password/request:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_phenirain_sso_internal_dto_auth.PasswordResetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Request password reset token
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_phenirain_sso_internal_dto_auth.AuthResponse'
+      summary: Refresh access token
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Logout user and clear refresh cookie
+      tags:
+      - auth
+  /auth/signUp:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_phenirain_sso_internal_dto_auth.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_phenirain_sso_internal_dto_auth.AuthResponse'
+      summary: Register user
+      tags:
+      - auth
+swagger: "2.0"

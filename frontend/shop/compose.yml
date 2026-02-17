@@ -1,0 +1,12 @@
+services:
+  # TODO: поправить образ и имя контейнера
+  adminer:
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    networks:
+      - coursework-net
+
+networks:
+  coursework-net:
+    driver: overlay
