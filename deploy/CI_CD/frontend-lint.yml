@@ -74,7 +74,7 @@ outdated:adminer:
   script:
     - cd frontend/adminer
     - pnpm install $PNPM_FLAGS
-    - pnpm outdated > outdated.txt
+    - pnpm outdated > outdated.txt || true
   artifacts:
     when: always
     expire_in: 7 days
