@@ -1,6 +1,6 @@
 stages:
-  - lint
   - build
+  - lint
   - test
   - audit
 

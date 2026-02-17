@@ -1,4 +1,5 @@
 .default_frontend_job:
+  tags: [docker-runner]
   image: node:20-alpine
   cache:
     key: "pnpm-${CI_COMMIT_REF_SLUG}"
