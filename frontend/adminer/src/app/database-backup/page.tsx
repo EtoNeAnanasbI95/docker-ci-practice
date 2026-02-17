@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CloudDownload, UploadCloud } from 'lucide-react';
+import { CloudDownload } from 'lucide-react';
 import { AdminLayout } from '@/widgets/admin-layout/ui/admin-layout';
 import {
   Card,
@@ -11,13 +11,10 @@ import {
   CardTitle,
 } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
 import { apiClient } from '@/shared/api/client';
 
 export default function DatabaseBackupPage() {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<'success' | 'error'>(
     'success'
@@ -48,29 +45,6 @@ export default function DatabaseBackupPage() {
       showMessage('error', 'Не удалось скачать SQL дамп. Попробуйте позже.');
     } finally {
       setIsDownloading(false);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      showMessage('error', 'Выберите файл бэкапа перед загрузкой');
-      return;
-    }
-
-    setIsUploading(true);
-    setMessage(null);
-    try {
-      await apiClient.uploadDatabaseBackup(selectedFile);
-      showMessage('success', 'База данных восстановлена из SQL дампа');
-      setSelectedFile(null);
-    } catch (error) {
-      console.error('Failed to upload backup', error);
-      showMessage(
-        'error',
-        'Ошибка восстановления. Убедитесь, что загружаете корректный SQL файл.'
-      );
-    } finally {
-      setIsUploading(false);
     }
   };
 

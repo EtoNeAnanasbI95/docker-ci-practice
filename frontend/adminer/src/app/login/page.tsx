@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Card,
@@ -20,7 +20,7 @@ import {
 
 const SSO_URL = process.env.NEXT_PUBLIC_SSO_URL ?? 'http://localhost:8081';
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [login, setLogin] = useState('');
@@ -81,56 +81,73 @@ export default function AdminLoginPage() {
   };
 
   return (
+    <Card className="w-full max-w-md shadow-lg">
+      <CardHeader className="space-y-1 text-center">
+        <CardTitle className="text-2xl font-semibold">Вход в админку</CardTitle>
+        <CardDescription>
+          Используйте учётные данные администратора или менеджера
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <label className="text-sm font-medium" htmlFor="admin-login">
+              Логин
+            </label>
+            <Input
+              id="admin-login"
+              name="login"
+              autoComplete="username"
+              value={login}
+              onChange={(event) => setLogin(event.target.value)}
+              placeholder="admin@example.com"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium" htmlFor="admin-password">
+              Пароль
+            </label>
+            <Input
+              id="admin-password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          {error && (
+            <p className="text-sm text-destructive" role="alert">
+              {error}
+            </p>
+          )}
+          <Button className="w-full" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Входим...' : 'Войти'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-12">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-semibold">Вход в админку</CardTitle>
-          <CardDescription>
-            Используйте учётные данные администратора или менеджера
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="admin-login">
-                Логин
-              </label>
-              <Input
-                id="admin-login"
-                name="login"
-                autoComplete="username"
-                value={login}
-                onChange={(event) => setLogin(event.target.value)}
-                placeholder="admin@example.com"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="admin-password">
-                Пароль
-              </label>
-              <Input
-                id="admin-password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            {error && (
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
-            )}
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Входим...' : 'Войти'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      <Suspense fallback={
+        <Card className="w-full max-w-md shadow-lg">
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-2xl font-semibold">Вход в админку</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-4">Загрузка...</div>
+          </CardContent>
+        </Card>
+      }>
+        <LoginForm />
+      </Suspense>
     </div>
   );
 }

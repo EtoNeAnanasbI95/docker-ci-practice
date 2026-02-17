@@ -40,7 +40,7 @@ const userSchema = z.object({
   telegramChatId: z.string().optional(),
   roleId: z.number().min(1, 'Роль обязательна'),
   fullName: z.string().min(2, 'ФИО обязательно'),
-  isArchived: z.boolean().default(false),
+  isArchived: z.boolean().optional(),
   password: z
     .string()
     .optional()

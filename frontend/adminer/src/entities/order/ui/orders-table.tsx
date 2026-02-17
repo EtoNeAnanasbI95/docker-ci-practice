@@ -40,7 +40,7 @@ export function OrdersTable() {
     const q = filter.trim().toLowerCase();
     if (!q) return orders ?? [];
     return (orders ?? []).filter((order) => {
-      const haystack = `${order.id} ${order.customer ?? ''} ${order.orderStatus ?? ''} ${order.paymentStatus ?? ''}`.toLowerCase();
+      const haystack = `${order.id} ${formatCustomer(order)} ${order.orderStatus ?? ''} ${order.paymentStatus ?? ''}`.toLowerCase();
       return haystack.includes(q);
     });
   }, [orders, filter]);
